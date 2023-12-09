@@ -26,19 +26,18 @@
         method: "POST",
         headers: {
           Authorization: "Bearer YOUR_ACCESS_TOKEN",
-          "X-Naver-Client-Id": "yuzo96myog",
-          "X-Naver-Client-Secret": "BJdeaANhRzHbkQDAlAJXeChkk9OziSfjYhgllLs6",
         },
         body: JSON.stringify({
           text,
         }),
+        mode: "no-cors",
       })
         .then((response) => response.json())
         .then((data) => {
           // 요약을 표시합니다.
           summaryDiv.innerHTML = data.summary;
         });
-    });
+
 
   </script>
 </body>
