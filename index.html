@@ -1,47 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
- <meta charset="UTF-8">
- <title>요약 테스트</title>
+  <title>자연어 처리기반 추상적 텍스트 요약</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #original-text, #summary-text {
+      width: 500px;
+      height: 500px;
+      margin: 0 auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    #summarize-button {
+      margin: 0 auto;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      background-color: #efefef;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
- <h1>네이버 클로버 서머리 AI</h1>
- <p>텍스트 박스에 글을 입력하면 네이버 클로버 서머리 AI를 통해 요약을 생성합니다.</p>
- <form id="form">
-   <textarea name="text" rows="10" cols="50"></textarea>
-   <input type="submit" value="요약 생성">
- </form>
- <div id="summary"></div>
- <textarea id="summary-output" rows="10" cols="50"></textarea>
- <script>
-   const form = document.getElementById("form");
-   const summaryDiv = document.getElementById("summary");
-   const summaryOutput = document.getElementById("summary-output");
+  <h1>자연어 처리기반 추상적 텍스트 요약</h1>
+  <textarea id="original-text" placeholder="요약할 텍스트를 입력하세요."></textarea>
+  <textarea id="summary-text" placeholder="요약된 텍스트가 표시됩니다." readonly></textarea>
+  <button id="summarize-button" onclick="summarize()">요약</button>
 
-   form.addEventListener("submit", (e) => {
-     e.preventDefault();
+  <script>
+    async function summarize() {
+      try {
+        const url = 'https://naveropenapi.apigw.ncloud.com/v1/nlp/summary';  // API URL 정확히 확인
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + '{client_id}:{client_secret}'
+        };
+        const body = {
+          'content': document.getElementById('original-text').value
+        };
 
-     const text = form.querySelector("textarea").value;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(body)
+        });
 
-     // 네이버 클로버 서머리 AI를 호출합니다.
-     fetch("https://openapi.naver.com/v1/summary/brief", {
-       method: "POST",
-       headers: {
-         Authorization: "Bearer YOUR_ACCESS_TOKEN",
-         "X-Naver-Client-Id": "yuzo96myog",
-         "X-Naver-Client-Secret": "BJdeaANhRzHbkQDAlAJXeChkk9OziSfjYhgllLs6",
-       },
-       body: JSON.stringify({
-         text,
-       }),
-     })
-       .then((response) => response.json())
-       .then((data) => {
-         // 요약을 표시합니다.
-         summaryDiv.innerHTML = data.summary;
-         summaryOutput.value = data.summary;
-       });
-   });
- </script>
+        if (response.ok) {
+          const responseBody = await response.json();
+          const summary = responseBody.summary;
+          document.getElementById('summary-text').value = summary;
+        } else {
+          console.error('API 요청 실패:', response.statusText);
+        }
+      } catch (error) {
+        console.error('오류 발생:', error);
+      }
+    }
+
+    document.getElementById('summarize-button').addEventListener('click', summarize);
+  </script>
 </body>
 </html>
