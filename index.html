@@ -64,6 +64,23 @@
       }
     }
 
+    function summarize(text) {
+      // callback 함수를 정의합니다.
+      const callback = function(data) {
+        // API의 응답을 처리합니다.
+        const summary = data.summary;
+        document.getElementById('summary').innerHTML = summary;
+      };
+    
+      // API를 호출할 때 callback 함수의 이름을 지정합니다.
+      const url = 'https://openapi.naver.com/v1/summary/brief?callback=callback';
+    
+      // HTTP 요청을 보냅니다.
+      const script = document.createElement('script');
+      script.src = url + '&text=' + encodeURIComponent(text);
+      document.body.appendChild(script);
+    }
+    
     document.getElementById('summarize-button').addEventListener('click', summarize);
   </script>
 </body>
