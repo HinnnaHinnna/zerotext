@@ -1,87 +1,153 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko-KR">
+
 <head>
-  <title>자연어 처리기반 추상적 텍스트 요약</title>
-  <style>
-    body {
-      font-family: sans-serif;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    #original-text, #summary-text {
-      width: 500px;
-      height: 500px;
-      margin: 0 auto;
-      padding: 10px;
-      border: 1px solid #ccc;
-    }
-
-    #summarize-button {
-      margin: 0 auto;
-      padding: 5px 10px;
-      border: 1px solid #ccc;
-      background-color: #efefef;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>0에 수렴하는 이야기</title>
 </head>
+
 <body>
-  <h1>자연어 처리기반 추상적 텍스트 요약</h1>
-  <textarea id="original-text" placeholder="요약할 텍스트를 입력하세요."></textarea>
-  <textarea id="summary-text" placeholder="요약된 텍스트가 표시됩니다." readonly></textarea>
-  <button id="summarize-button" onclick="summarize()">요약</button>
-
-  <script>
-    async function summarize() {
-      try {
-        const url = 'https://naveropenapi.apigw.ncloud.com/v1/nlp/summary';  // API URL 정확히 확인
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + '{client_id}:{client_secret}'
-        };
-        const body = {
-          'content': document.getElementById('original-text').value
-        };
-
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: headers,
-          body: JSON.stringify(body)
-        });
-
-        if (response.ok) {
-          const responseBody = await response.json();
-          const summary = responseBody.summary;
-          document.getElementById('summary-text').value = summary;
-        } else {
-          console.error('API 요청 실패:', response.statusText);
+    <style>
+        body {
+            margin-right: 30px;
+            font-family: 'Pretendard-Regular';
+            font-size: 16px;
+            line-height: 1.5;
+            font-weight: 300;
+            overflow-y: hidden; /* 가로 스크롤을 감춤 */
+            word-break: keep-all;
         }
-      } catch (error) {
-        console.error('오류 발생:', error);
-      }
-    }
 
-    function summarize(text) {
-      // callback 함수를 정의합니다.
-      const callback = function(data) {
-        // API의 응답을 처리합니다.
-        const summary = data.summary;
-        document.getElementById('summary').innerHTML = summary;
+        #startButton,
+        #stopButton,
+        #summarizeButton,
+        #ttsButton,
+        #stopTTSButton,
+        #stopSummarizeButton {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background-color: rgb(0, 255, 68);
+            border: none;
+        }
+
+        #transcription-textarea,
+        #summary-textarea {
+            width: 100%;
+            border: 1px solid black;
+            padding: 8px;
+            font-family: 'Pretendard-Regular';
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard.woff') format('woff');
+            font-style: normal;
+        }
+    </style>
+
+    <p> 흰색 가루가 든 통을 살펴보았다. 분명히 설탕 통이었다. 샴페인 병에 샴페인이 들어갈 수밖에 없듯 이 통에도 설탕이 들어 있어야 했다. 어째서 소금을 넣어 놓은 것일까. 다른 통은 없나 살펴보니 소금 통이 있었다. 소금 통에는 특별한 점이 없을까. 찍어서 맛을 보니 설탕이었다. 갑자기 호기심이 생긴 그는 식당 안을 둘러보며 소금 통과 설탕 통의 내용물을 바꿔 넣은 독특한 예술적 취향의 다른 흔적은 없는지 살폈다. 흰색 벽지로 도배된 한쪽 벽에 이상한 검은 얼룩이 있을 뿐 전체적으로 깔끔하고 유쾌하며 평범한 느낌이었다.
+        발랑탱은 벨을 눌러 웨이터를 불렀다.
+        “아침마다 손님들을 상대로 이런 장난을 치는 건가? 소금과 설탕을 바꿔치기하는 것이 그렇게 재미있는 모양이지?”
+        발랑탱이 물었다.
+        상황을 파악한 웨이터는 절대 그런 의도는 없었다고, 도무지 이해할 수 없는 실수라고 변명을 늘어놓았다. 설탕 통을 집어 들어 들여다보다가 다시 소금 통을 집어 들어 들여다보는 그의 얼굴 표정이 점점 난감해졌다. 결국 웨이터는 양해를 구하고 물러나더니 잠시 뒤 지배인과 함께 나타났다. 지배인 역시 설탕 통과 소금 통을 살펴보고는 당황한 표정을 감추지 못했다.
+        갑자기 웨이터가 급한 마음에 더듬거리며 입을 열었다.
+        “저기, 그러니까, 그 성직자 두 명이었나 봅니다.”
+        “성직자 두 명이라니?”
+        “저 벽에 수프를 쏟은 성직자들 말입니다.”
+        - 『브라운 신부의 순진』, 「푸른 십자가」 일부
+    </p>
+    <div id="transcription">
+        <textarea id="transcription-textarea" rows="10">시작 버튼을 누르고 위의 글을 따라 읽으시오.</textarea>
+        <button id="startButton">시작</button>
+        <button id="stopButton" disabled>중지</button>
+    </div>
+
+    <div id="summary">
+      <textarea id="summary-textarea" rows="10"></textarea>
+      <button id="summarizeButton">요약</button>
+      <button id="stopSummarizeButton" disabled>변환 중지</button>
+      <button id="ttsButton">변환</button>
+      <button id="stopTTSButton" disabled>변환 중지</button>
+  </div>
+  
+  <script>
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = 'ko-KR';
+      recognition.continuous = true; // 음성 인식을 지속적으로 수행합니다.
+  
+      const transcriptionTextarea = document.getElementById('transcription-textarea');
+      const startButton = document.getElementById('startButton');
+      const stopButton = document.getElementById('stopButton');
+      const summarizeButton = document.getElementById('summarizeButton');
+      const stopSummarizeButton = document.getElementById('stopSummarizeButton');
+      const summaryTextarea = document.getElementById('summary-textarea');
+      const ttsButton = document.getElementById('ttsButton');
+      const stopTTSButton = document.getElementById('stopTTSButton');
+  
+      ttsButton.addEventListener('click', () => {
+          const utterance = new SpeechSynthesisUtterance(summaryTextarea.value);
+          utterance.lang = 'ko-KR';
+          speechSynthesis.speak(utterance);
+      });
+  
+      summarizeButton.addEventListener('click', () => {
+          const text = transcriptionTextarea.value;
+  
+          fetch('https://api.openai.com/v1/engines/davinci/completions', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer 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' // 여기에 자신의 OpenAI API 키를 넣어주세요.
+              },
+              body: JSON.stringify({
+                  prompt: text,
+                  max_tokens: 50, // 요약 텍스트의 최대 토큰 수
+                  temperature: 0.3, // 생성 텍스트의 다양성 조절
+                  top_p: 1,
+                  stop: ['\n']
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.choices && data.choices.length > 0) {
+                  const summary = data.choices[0].text.trim();
+                  summaryTextarea.value = summary;
+              } else {
+                  console.error('No completion choices returned.');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+      });
+  
+      recognition.onresult = (event) => {
+          const result = event.results[event.results.length - 1];
+          const spokenText = result[0].transcript;
+          transcriptionTextarea.value += ' ' + spokenText;
       };
-    
-      // API를 호출할 때 callback 함수의 이름을 지정합니다.
-      const url = 'https://openapi.naver.com/v1/summary/brief?callback=callback';
-    
-      // HTTP 요청을 보냅니다.
-      const script = document.createElement('script');
-      script.src = url + '&text=' + encodeURIComponent(text);
-      document.body.appendChild(script);
-    }
-    
-    document.getElementById('summarize-button').addEventListener('click', summarize);
+  
+      recognition.onend = () => {
+          startButton.disabled = false;
+          stopButton.disabled = true;
+      };
+  
+      startButton.addEventListener('click', () => {
+          transcriptionTextarea.value = "";
+          summaryTextarea.value = "";
+          recognition.start();
+          startButton.disabled = true;
+          stopButton.disabled = false;
+      });
+  
+      stopButton.addEventListener('click', () => {
+          recognition.stop();
+          startButton.disabled = false;
+          stopButton.disabled = true;
+      });
   </script>
-</body>
-</html>
+  </body>
+  </html>
